@@ -10,4 +10,6 @@ repositories {
 }
 
 dependencies {
+    compileOnly("org.apiguardian:apiguardian-api:1.1.0")
+    compileOnly("com.google.code.findbugs:jsr305:3.0.2")
 }
