@@ -330,6 +330,23 @@ public interface Uri extends UriRef {
     String fragment();
 
     /**
+     * Tells whether or not this URI is
+     * <a href="https://tools.ietf.org/html/rfc3986#section-4.3">absolute-URI</a>.
+     *
+     * <p> Some protocol elements allow only the absolute form of a URI without
+     * a fragment identifier. For example, defining a base URI for later
+     * use by relative references calls for an absolute-URI syntax rule that
+     * does not allow a fragment.
+     *
+     * <pre>    absolute-URI = scheme ":" hier-part [ "?" query ]</pre>
+     *
+     * @return {@code true} if, and only if, this URI is absolute-URI.
+     */
+    default boolean isAbsolute() {
+        return fragment() == null;
+    }
+
+    /**
      * Returns the content of this URI as a string.
      *
      * @return The string form of this URI
