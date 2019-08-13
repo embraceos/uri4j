@@ -347,6 +347,54 @@ public interface Uri extends UriRef {
     }
 
     /**
+     * Resolves the given URI-reference against this URI to obtain target URI
+     * as per the resolution mechanism defined by
+     * <a href="https://tools.ietf.org/html/rfc3986#section-5">RFC 3986</a>.
+     *
+     * <p> If the fragment component of this URI is defined, then it would be stripped
+     * within the process of reference resolution, i.e., it will not be used to compose
+     * the target URI, the fragment component of the target URI is completely depends
+     * on the given URI-reference, as the semantics of fragment are defined by the type
+     * of resource specified by the target URI.
+     *
+     * <p> The resolution process may be non-strict, so that ignores the scheme component
+     * of the URI-reference, if it is identical to the scheme component of this URI.
+     *
+     * <p> For more information about reference resolution, see
+     * <a href="https://tools.ietf.org/html/rfc3986#section-5">RFC 3986 (section 5.2 and 5.3)</a>.
+     *
+     * @param uriRef The URI-reference to be resolved against this URI
+     * @param strict Whether or not the resolution process is strict
+     * @return The resolved target URI
+     * @see #resolve(UriRef)
+     */
+    Uri resolve(UriRef uriRef, boolean strict);
+
+    /**
+     * Resolves the given URI-reference against this URI strictly to obtain target URI
+     * as per the resolution mechanism defined by
+     * <a href="https://tools.ietf.org/html/rfc3986#section-5">RFC 3986</a>.
+     *
+     * <p> Same as invoke method: <pre>    resolve(uriRef, true)</pre>
+     *
+     * <p> If the fragment component of this URI is defined, then it would be stripped
+     * within the process of reference resolution, i.e., it will not be used to compose
+     * the target URI, the fragment component of the target URI is completely depends
+     * on the given URI-reference, as the semantics of fragment are defined by the type
+     * of resource specified by the target URI.
+     *
+     * <p> For more information about reference resolution, see
+     * <a href="https://tools.ietf.org/html/rfc3986#section-5">RFC 3986 (section 5.2 and 5.3)</a>.
+     *
+     * @param uriRef The URI-reference to be resolved against this URI
+     * @return The resolved target URI
+     * @see #resolve(UriRef, boolean)
+     */
+    default Uri resolve(UriRef uriRef) {
+        return resolve(uriRef, true);
+    }
+
+    /**
      * Returns the content of this URI as a string.
      *
      * @return The string form of this URI
