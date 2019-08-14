@@ -395,6 +395,34 @@ public interface Uri extends UriRef {
     }
 
     /**
+     * <a href="https://tools.ietf.org/html/rfc3986#section-6">Normalizes</a> this URI,
+     * and returns the normalized URI or just this URI if it is already in normalized form.
+     *
+     * <p> One of the most common operations on URIs is simple comparison:
+     * determining whether two URIs are equivalent without using the URIs to
+     * access their respective resource(s).
+     *
+     * <p> Proper normalization can reduce the probability of false negatives when compares
+     * two URIs. <a href="https://tools.ietf.org/html/rfc3986#section-6">RFC 3986</a> defines
+     * three levels of normalization, with the amount of processing required increases but
+     * the probability of false negatives decreases:
+     *
+     * <ol>
+     *   <li><a href="https://tools.ietf.org/html/rfc3986#section-6.2.2">Syntax-Based Normalization</a></li>
+     *   <li><a href="https://tools.ietf.org/html/rfc3986#section-6.2.3">Scheme-Based Normalization</a></li>
+     *   <li><a href="https://tools.ietf.org/html/rfc3986#section-6.2.4">Protocol-Based Normalization</a></li>
+     * </ol>
+     *
+     * <p> This method defaults to employ the {@code Syntax-Based normalization} to normalize this URI.
+     * If you want to employ the other level of normalization, or even normalize the URI completely
+     * customizedly, use {@link UriNormalizer} instead or override this method in subclasses.
+     *
+     * @return The normalized URI or just this URI if it is already in normalized form
+     * @see UriNormalizer
+     */
+    Uri normalize();
+
+    /**
      * Returns the content of this URI as a string.
      *
      * @return The string form of this URI
