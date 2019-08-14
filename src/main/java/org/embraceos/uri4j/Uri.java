@@ -92,7 +92,7 @@ import org.embraceos.uri4j.lang.Nullable;
  * @see java.net.URI
  */
 @API(status = API.Status.STABLE)
-public interface Uri extends UriRef {
+public interface Uri extends UriRef, Comparable<Uri> {
 
     /**
      * Returns the <a href="https://tools.ietf.org/html/rfc3986#section-3.1">scheme </a>
@@ -421,6 +421,111 @@ public interface Uri extends UriRef {
      * @see UriNormalizer
      */
     Uri normalize();
+
+    /**
+     * Compares this URI with the given URI.
+     *
+     * <p> One of the most common operations on URIs is simple comparison:
+     * determining whether two URIs are equivalent without using the URIs to
+     * access their respective resource(s).
+     *
+     * <p> When comparing corresponding components of two URIs, if one
+     * component is undefined but the other is defined then the first is
+     * considered to be less than the second.  Unless otherwise noted, string
+     * components are ordered according to their natural, case-sensitive
+     * ordering as defined by the {@link String#compareTo(String)} method.
+     *
+     * <p> The ordering of URIs is defined as follows:
+     *
+     * <ol>
+     *   <li> Compares the scheme components of two URIs, <b>without regard to case</b>.
+     *   Continues to next step if equal.
+     *
+     *   <li> The URI with host component is considered to be less than
+     *   the URI without host component. If both URIs contain host component,
+     *   compares the host components, <b>without regard to case</b>.
+     *   Continues to next step if equal or both URIs don't contain host component.
+     *
+     *   <li> The URI with port component is considered to be less than
+     *   the URI without port component. If both URIs contain port component,
+     *   the URI with non-empty port component is considered to be less than the URI
+     *   with empty port component. If both URIs contain non-empty port component,
+     *   compares the port components <b>as numbers</b>.
+     *   Continues to next step if equal or both URIs don't contain port component.
+     *
+     *   <li> The URI with userinfo component is considered to be less than
+     *   the URI without userinfo component. If both URIs contain userinfo component,
+     *   compares the userinfo components. Continues to next step if equal
+     *   or both URIs don't contain userinfo component.
+     *
+     *   <li> Compares the path components of two URIs. Continues to next step if equal.
+     *
+     *   <li> The URI with query component is considered to be less than
+     *   the URI without query component. If both URIs contain query component,
+     *   compares the query components. Continues to next step if equal
+     *   or both URIs don't contain query component.
+     *
+     *   <li> The URI with fragment component is considered to be less than
+     *   the URI without fragment component. If both URIs contain fragment component,
+     *   compares the fragment components. Continues to next step if equal
+     *   or both URIs don't contain fragment component.
+     * </ol>
+     *
+     * <p> Recommends to normalize this URI and the given URI before comparison to reduce the
+     * probability of false negatives.
+     *
+     * <p> This method satisfies the general contract of the {@link Comparable#compareTo(Object)} method,
+     * and is consistent with the {@link #equals(Object)} method.
+     *
+     * @param that The URI to be compared with this URI
+     * @return A negative integer, zero, or a positive integer as this URI is
+     * less than, equal to, or greater than the given URI
+     * @see #equals(Object)
+     * @see #normalize()
+     */
+    @Override
+    int compareTo(Uri that);
+
+    /**
+     * Tests this URI for equality with another object.
+     *
+     * <p> If the given object is not a URI then this method immediately
+     * returns {@code false}.
+     *
+     * <p> The two URIs are considered to be equal if, and only if, following
+     * conditions are all met:
+     *
+     * <ul>
+     *   <li> Their scheme components are equal without regard to case.
+     *   <li> Their host components are either both be undefined or else be equal without regard to case.
+     *   <li> Their port components are either both be undefined or else be equal.
+     *   <li> Their userinfo components are either both be undefined or else be equal.
+     *   <li> Their path components are equal.
+     *   <li> Their query components are either both be undefined or else be equal.
+     *   <li> Their fragment components are either both be undefined or else be equal.
+     * </ul>
+     *
+     * <p> This method satisfies the general contract of the {@link Object#equals(Object) Object.equals} method,
+     * and is consistent with the {@link #compareTo(Uri)} method.
+     *
+     * @param that The object to which this URI is to be compared
+     * @return {@code true} if, and only if, the given object is a URI that is identical to this URI
+     * @see #compareTo(Uri)
+     * @see #hashCode()
+     */
+    @Override
+    boolean equals(@Nullable Object that);
+
+    /**
+     * Returns a hash-code value for this URI.  The hash code is based upon all
+     * of the URI's components, and satisfies the general contract of the
+     * {@link Object#hashCode() Object.hashCode} method.
+     *
+     * @return A hash-code value for this URI
+     * @see #equals(Object)
+     */
+    @Override
+    int hashCode();
 
     /**
      * Returns the content of this URI as a string.
