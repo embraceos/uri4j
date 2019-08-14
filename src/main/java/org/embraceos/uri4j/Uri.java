@@ -366,9 +366,10 @@ public interface Uri extends UriRef, Comparable<Uri> {
      * @param uriRef The URI-reference to be resolved against this URI
      * @param strict Whether or not the resolution process is strict
      * @return The resolved target URI
+     * @throws UriException if there is problem resolving URI-reference
      * @see #resolve(UriRef)
      */
-    Uri resolve(UriRef uriRef, boolean strict);
+    Uri resolve(UriRef uriRef, boolean strict) throws UriException;
 
     /**
      * Resolves the given URI-reference against this URI strictly to obtain target URI
@@ -388,9 +389,10 @@ public interface Uri extends UriRef, Comparable<Uri> {
      *
      * @param uriRef The URI-reference to be resolved against this URI
      * @return The resolved target URI
+     * @throws UriException if there is problem resolving URI-reference
      * @see #resolve(UriRef, boolean)
      */
-    default Uri resolve(UriRef uriRef) {
+    default Uri resolve(UriRef uriRef) throws UriException {
         return resolve(uriRef, true);
     }
 
@@ -418,9 +420,10 @@ public interface Uri extends UriRef, Comparable<Uri> {
      * customizedly, use {@link UriNormalizer} instead or override this method in subclasses.
      *
      * @return The normalized URI or just this URI if it is already in normalized form
+     * @throws UriException if there is problem normalizing this URI
      * @see UriNormalizer
      */
-    Uri normalize();
+    Uri normalize() throws UriException;
 
     /**
      * Compares this URI with the given URI.

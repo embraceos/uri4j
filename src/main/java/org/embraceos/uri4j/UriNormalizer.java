@@ -48,7 +48,8 @@ public interface UriNormalizer {
      *
      * @param uri The URI to be normalized
      * @return The normalized URI or just the given URI if it is already in normalized form
+     * @throws UriException if there is problem normalizing the URI
      */
-    Uri normalize(Uri uri);
+    Uri normalize(Uri uri) throws UriException;
 
 }

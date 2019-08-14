@@ -111,8 +111,9 @@ public interface Path extends Iterable<String> {
      *
      * @param that The path component to be resolved against this path component
      * @return The resolved path component
+     * @throws UriException if there is problem resolving path component
      */
-    Path resolve(Path that);
+    Path resolve(Path that) throws UriException;
 
     /**
      * <a href="https://tools.ietf.org/html/rfc3986#section-6.2.2.3">Normalizes</a> this path
@@ -120,8 +121,9 @@ public interface Path extends Iterable<String> {
      * is already in normalized form.
      *
      * @return The normalized path component or just this path component if it is already in normalized form
+     * @throws UriException if there is problem normalizing this path component
      */
-    Path normalize();
+    Path normalize() throws UriException;
 
     /**
      * Returns an iterator over segments of this path component.
