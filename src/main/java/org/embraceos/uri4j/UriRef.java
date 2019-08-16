@@ -251,4 +251,11 @@ public interface UriRef {
     @Override
     String toString();
 
+    /**
+     * Returns a builder to mutate components of this URI-reference.
+     *
+     * @return The builder
+     */
+    UriBuilder mutate();
+
 }

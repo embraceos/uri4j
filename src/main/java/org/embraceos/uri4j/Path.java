@@ -168,4 +168,11 @@ public interface Path extends Iterable<String> {
     @Override
     String toString();
 
+    /**
+     * Returns a builder to mutate path component.
+     *
+     * @return The builder
+     */
+    PathBuilder mutate();
+
 }

@@ -538,4 +538,11 @@ public interface Uri extends UriRef, Comparable<Uri> {
     @Override
     String toString();
 
+    /**
+     * Returns a builder to mutate components of this URI.
+     *
+     * @return The builder
+     */
+    UriBuilder mutate();
+
 }
