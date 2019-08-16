@@ -19,6 +19,8 @@ package org.embraceos.uri4j;
 import org.apiguardian.api.API;
 import org.embraceos.uri4j.lang.Nullable;
 
+import java.net.URI;
+
 /**
  * This interface represents the URI as defined by
  * <a href="https://tools.ietf.org/html/rfc3986">RFC3986</a>.
@@ -544,5 +546,14 @@ public interface Uri extends UriRef, Comparable<Uri> {
      * @return The builder
      */
     UriBuilder mutate();
+
+    /**
+     * Returns the {@link URI} converted from this {@link Uri}.
+     *
+     * @return The converted {@link URI}
+     * @throws UriException when there is something wrong with converting
+     */
+    @Override
+    URI toJdk() throws UriException;
 
 }
