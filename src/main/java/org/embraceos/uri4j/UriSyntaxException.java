@@ -17,7 +17,7 @@
 package org.embraceos.uri4j;
 
 import org.apiguardian.api.API;
-import org.embraceos.uri4j.lang.Nullable;
+import org.embraceos.uri4j.internal.lang.Nullable;
 
 /**
  * Thrown to indicate an exception has occurred with the syntax of URI-reference.

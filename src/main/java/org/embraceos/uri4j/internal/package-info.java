@@ -15,10 +15,14 @@
  */
 
 /**
- * Common annotations with language-level semantics: nullability.
+ * All contents in this package including nested packages are for internal usage only.
  *
- * <p>Used descriptively within the framework codebase. Can be validated by build-time tools
- * (e.g. FindBugs or Animal Sniffer), alternative JVM languages (e.g. Kotlin), as well as IDEs
- * (e.g. IntelliJ IDEA or Eclipse with corresponding project setup).
+ * <p> Unless annotated explicitly with {@link org.apiguardian.api.API}, all types are
+ * considered to be annotated with {@code @API(status = API.Status.INTERNAL)} by default.
  */
-package org.embraceos.uri4j.lang;
+@NonNullApi
+@NonNullFields
+package org.embraceos.uri4j.internal;
+
+import org.embraceos.uri4j.internal.lang.NonNullApi;
+import org.embraceos.uri4j.internal.lang.NonNullFields;

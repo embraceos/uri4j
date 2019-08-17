@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.embraceos.uri4j.lang;
+package org.embraceos.uri4j.internal.lang;
 
 import org.apiguardian.api.API;
 
@@ -45,6 +45,5 @@ import java.lang.annotation.*;
 @Documented
 @Nonnull
 @TypeQualifierNickname
-@API(status = API.Status.INTERNAL)
 public @interface NonNull {
 }

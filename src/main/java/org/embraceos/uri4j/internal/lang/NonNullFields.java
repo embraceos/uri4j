@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.embraceos.uri4j.lang;
+package org.embraceos.uri4j.internal.lang;
 
 import org.apiguardian.api.API;
 
@@ -23,17 +23,17 @@ import javax.annotation.meta.TypeQualifierDefault;
 import java.lang.annotation.*;
 
 /**
- * A common annotation to declare that parameters and return values
- * are to be considered as non-nullable by default for a given package.
+ * A common annotation to declare that fields are to be considered as
+ * non-nullable by default for a given package.
  *
  * <p>Leverages JSR-305 meta-annotations to indicate nullability in Java to common
  * tools with JSR-305 support and used by Kotlin to infer nullability.
  *
  * <p>Should be used at package level in association with {@link Nullable}
- * annotations at parameter and return value level.
+ * annotations at field level.
  *
  * @author Carrick Hong (洪灿昆)
- * @see NonNullFields
+ * @see NonNullApi
  * @see Nullable
  * @see NonNull
  */
@@ -41,7 +41,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Nonnull
-@TypeQualifierDefault({ElementType.METHOD, ElementType.PARAMETER})
-@API(status = API.Status.INTERNAL)
-public @interface NonNullApi {
+@TypeQualifierDefault(ElementType.FIELD)
+public @interface NonNullFields {
 }
