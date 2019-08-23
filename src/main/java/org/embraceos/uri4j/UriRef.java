@@ -19,6 +19,7 @@ package org.embraceos.uri4j;
 import org.apiguardian.api.API;
 import org.embraceos.uri4j.internal.lang.Nullable;
 
+import javax.annotation.concurrent.Immutable;
 import java.net.URI;
 
 /**
@@ -43,6 +44,7 @@ import java.net.URI;
  * @see java.net.URI
  */
 @API(status = API.Status.STABLE)
+@Immutable
 public interface UriRef {
 
     /**

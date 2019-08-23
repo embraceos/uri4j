@@ -18,6 +18,7 @@ package org.embraceos.uri4j;
 
 import org.apiguardian.api.API;
 
+import javax.annotation.concurrent.Immutable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Spliterator;
@@ -55,6 +56,7 @@ import java.util.function.Consumer;
  * @author Carrick Hong (洪灿昆)
  */
 @API(status = API.Status.STABLE)
+@Immutable
 public interface Path extends Iterable<String> {
 
     /**
