@@ -17,6 +17,7 @@
 package org.embraceos.uri4j;
 
 import org.apiguardian.api.API;
+import org.embraceos.uri4j.internal.impl.UriEncoderImpl;
 
 import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
@@ -33,6 +34,113 @@ import java.nio.charset.StandardCharsets;
  */
 @API(status = API.Status.STABLE)
 public interface UriEncoder {
+
+    /**
+     * Returns a thread-safe UriEncoder which allows all unresolved characters only,
+     * and will always replace malformed-input and unmappable-character
+     * sequences with charset's default replacement byte array.
+     *
+     * @return an UriEncoder
+     */
+    static UriEncoder forData() {
+        return UriEncoderImpl.UNRESOLVED;
+    }
+
+    /**
+     * Returns a thread-safe UriEncoder which allows unresolved characters and the other given ones,
+     * and will always replace malformed-input and unmappable-character
+     * sequences with charset's default replacement byte array.
+     *
+     * @param allowedDelims allowed delimiters
+     * @return an UriEncoder
+     * @throws IllegalArgumentException if the given delimiters contain ones that is not allowed by RFC3986
+     */
+    static UriEncoder forComponent(String allowedDelims) throws IllegalArgumentException {
+        return UriEncoderImpl.extra(allowedDelims);
+    }
+
+    /**
+     * Returns a thread-safe UriEncoder to be used to encode userinfo components,
+     * which will always replace malformed-input and unmappable-character
+     * sequences with charset's default replacement byte array.
+     *
+     * @return an UriEncoder
+     */
+    static UriEncoder forUserInfo() {
+        return UriEncoderImpl.USER_INFO;
+    }
+
+    /**
+     * Returns a thread-safe UriEncoder to be used to encode host components treated as
+     * <a href="https://tools.ietf.org/html/rfc3986#section-3.2.2">reg-name</a>,
+     * which will always replace malformed-input and unmappable-character
+     * sequences with charset's default replacement byte array.
+     *
+     * @return an UriEncoder
+     */
+    static UriEncoder forHost() {
+        return UriEncoderImpl.HOST;
+    }
+
+    /**
+     * Returns a thread-safe UriEncoder to be used to encode path components,
+     * which will always replace malformed-input and unmappable-character
+     * sequences with charset's default replacement byte array.
+     *
+     * @return an UriEncoder
+     */
+    static UriEncoder forPath() {
+        return UriEncoderImpl.PATH;
+    }
+
+    /**
+     * Returns a thread-safe UriEncoder to be used to encode path segment components,
+     * which will always replace malformed-input and unmappable-character
+     * sequences with charset's default replacement byte array.
+     *
+     * @return an UriEncoder
+     */
+    static UriEncoder forSegment() {
+        return UriEncoderImpl.SEGMENT;
+    }
+
+    /**
+     * Returns a thread-safe UriEncoder to be used to encode query components,
+     * which will always replace malformed-input and unmappable-character
+     * sequences with charset's default replacement byte array.
+     *
+     * @return an UriEncoder
+     */
+    static UriEncoder forQuery() {
+        return UriEncoderImpl.QUERY;
+    }
+
+    /**
+     * Returns a thread-safe UriEncoder to be used to encode fragment components,
+     * which will always replace malformed-input and unmappable-character
+     * sequences with charset's default replacement byte array.
+     *
+     * @return an UriEncoder
+     */
+    static UriEncoder forFragment() {
+        return UriEncoderImpl.FRAGMENT;
+    }
+
+    /**
+     * Returns a thread-safe UriEncoder to be used to encode whole URI,
+     * which can't encode components by their according requirements but just encodes
+     * all characters that's not allowed to present in URI, and
+     * will always replace malformed-input and unmappable-character
+     * sequences with charset's default replacement byte array.
+     *
+     * <p> It is preferred to use a more specific UriEncoder to get more precise control
+     * over URI encoding such as the one returned by {@link #forPath()}.
+     *
+     * @return an UriEncoder
+     */
+    static UriEncoder forURI() {
+        return UriEncoderImpl.URI;
+    }
 
     /**
      * Encodes the raw bytes to percent-encoded string.

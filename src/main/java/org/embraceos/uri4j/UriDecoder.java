@@ -17,6 +17,7 @@
 package org.embraceos.uri4j;
 
 import org.apiguardian.api.API;
+import org.embraceos.uri4j.internal.impl.UriDecoderImpl;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -31,6 +32,16 @@ import java.nio.charset.StandardCharsets;
  */
 @API(status = API.Status.STABLE)
 public interface UriDecoder {
+
+    /**
+     * Returns an UriDecoder instance which's thread-safe and always replaces malformed-input
+     * and unmappable-character sequences with charset's default replacement string.
+     *
+     * @return an UriDecoder
+     */
+    static UriDecoder get() {
+        return UriDecoderImpl.INSTANCE;
+    }
 
     /**
      * Decodes the encoded string to raw bytes.
