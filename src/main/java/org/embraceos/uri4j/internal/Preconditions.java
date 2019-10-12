@@ -99,6 +99,7 @@ public abstract class Preconditions {
      * @see #checkPositiveRange(int, int, int)
      */
     public static void checkRange(int size, int start, int end) throws IndexOutOfBoundsException, IllegalArgumentException {
+        if (start == end && start == size) return;
         checkIndex(start, size, "start index");
         checkIndex(end, size + 1, "end index");
     }
