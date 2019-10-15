@@ -186,6 +186,14 @@ public interface UriBuilder {
      * with <a href="https://tools.ietf.org/html/rfc2396">RFC 2396</a> that doesn't allow
      * host component to contain percent-encoded data.
      *
+     * <p><b>Caution:</b> The reg-name syntax allows percent-encoded octets in order to
+     * represent non-ASCII registered names in a uniform way that is
+     * independent of the underlying name resolution technology.  Non-ASCII
+     * characters must first be encoded according to UTF-8 [STD63], and then
+     * each octet of the corresponding UTF-8 sequence must be percent-encoded
+     * to be represented as URI characters. URI producing applications must not use
+     * percent-encoding in host unless it is used to represent a UTF-8 character sequence.
+     *
      * @param host The given {@code raw} host component
      * @return This builder for further processing
      * @see #host(String)
