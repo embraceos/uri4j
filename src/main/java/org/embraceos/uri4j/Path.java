@@ -57,7 +57,7 @@ import java.util.function.Consumer;
  */
 @API(status = API.Status.STABLE)
 @Immutable
-public interface Path extends Iterable<String> {
+public interface Path extends Iterable<String>, Comparable<Path> {
 
     /**
      * Returns the path component as a whole string, which will not be null,
@@ -161,6 +161,57 @@ public interface Path extends Iterable<String> {
     default Spliterator<String> spliterator() {
         return segments().spliterator();
     }
+
+    /**
+     * Compares this Path with the given Path.
+     *
+     * <p> The ordering of Paths is determined by comparing their {@link #value()}.
+     *
+     * <p> Recommends to normalize this Path and the given Path before comparison to reduce the
+     * probability of false negatives.
+     *
+     * <p> This method satisfies the general contract of the {@link Comparable#compareTo(Object)} method,
+     * and is consistent with the {@link #equals(Object)} method.
+     *
+     * @param that The Path to be compared with this Path
+     * @return A negative integer, zero, or a positive integer as this Path is
+     * less than, equal to, or greater than the given Path
+     * @see #equals(Object)
+     * @see #normalize()
+     */
+    @Override
+    default int compareTo(Path that) {
+        return this.value().compareTo(that.value());
+    }
+
+    /**
+     * Tests this Path for equality with another object.
+     *
+     * <p> If the given object is not a Path then this method immediately returns {@code false}.
+     *
+     * <p> The two Paths are considered to be equal if, and only if, their {@link #value()} are equal.
+     *
+     * <p> This method satisfies the general contract of the {@link Object#equals(Object) Object.equals} method,
+     * and is consistent with the {@link #compareTo(Path)} method.
+     *
+     * @param that The object to which this Path is to be compared
+     * @return {@code true} if, and only if, the given object is a Path that is identical to this Path
+     * @see #hashCode()
+     * @see #compareTo(Path)
+     */
+    @Override
+    boolean equals(Object that);
+
+    /**
+     * Returns a hash-code value for this Path, which is same as the hash-code of {@link #value()}.
+     * The hash code satisfies the general contract of the
+     * {@link java.lang.Object#hashCode() Object.hashCode} method.
+     *
+     * @return A hash-code value for this Path
+     * @see #equals(Object)
+     */
+    @Override
+    int hashCode();
 
     /**
      * Returns the string representation of this path, i.e., {@link #value()}.
