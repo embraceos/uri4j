@@ -421,7 +421,7 @@ public interface Uri extends UriRef, Comparable<Uri> {
      *
      * <p> This method defaults to employ the {@code Syntax-Based normalization} to normalize this URI.
      * If you want to employ the other level of normalization, or even normalize the URI completely
-     * customizedly, use {@link UriNormalizer} instead or override this method in subclasses.
+     * differently, use {@link UriNormalizer} instead or override this method in subclasses.
      *
      * @return The normalized URI or just this URI if it is already in normalized form
      * @throws UriException if there is problem normalizing this URI
@@ -474,8 +474,7 @@ public interface Uri extends UriRef, Comparable<Uri> {
      *
      *   <li> The URI with fragment component is considered to be less than
      *   the URI without fragment component. If both URIs contain fragment component,
-     *   compares the fragment components. Continues to next step if equal
-     *   or both URIs don't contain fragment component.
+     *   compares the fragment components.
      * </ol>
      *
      * <p> Recommends to normalize this URI and the given URI before comparison to reduce the
