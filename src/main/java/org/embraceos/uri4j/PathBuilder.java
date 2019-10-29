@@ -38,13 +38,12 @@ import org.apiguardian.api.API;
  *
  * <p> There are also some methods to append given paths to this builder for adding existing
  * paths conveniently, e.g., {@link #paths(String...)} and {@link #rawPaths(byte[]...)}.
- * Two paths p1 and p2 are concatenated as follows:
+ * The path p is appended as follows:
  * <ul>
- *   <li> If p1 ends with slash, and p2 starts with slash, then the result will be p1
- *   concatenated with p2 of which first slash character is removed.
- *   <li> If p1 doesn't end with slash, and p2 doesn't start with slash, then the result
- *   will be p1 concatenated with slash character, and then p2 concatenated, i.e., p1 + "/" + p2.
- *   <li> Otherwise, the result will simply be p1 concatenated with p2, i.e., p1 + p2.
+ *   <li> p is split to segments despite whether it's absolute or not ("/a/b/c" and "a/b/c" are all split
+ *   to segments "a", "b" and "c").
+ *   <li> If the tail segment is empty, remove it.
+ *   <li> Append these segments to builder.
  * </ul>
  *
  * <p> There are also some methods to remove segments conveniently, such as {@link #strip(int)}
@@ -300,7 +299,7 @@ public interface PathBuilder {
     PathBuilder clear();
 
     /**
-     * Sets whether the final path component is absolute or not.
+     * Sets whether the final path component is absolute or not. If unset, the default is true.
      *
      * @param absolute Whether the final path is absolute or not
      * @return This path builder for further processing
@@ -309,16 +308,10 @@ public interface PathBuilder {
     PathBuilder absolute(boolean absolute);
 
     /**
-     * Builds and returns the final path component.
+     * Builds and returns the final path component which in {@link Path#normalize() normalized form}.
      *
      * <p> If none segment is added to this builder, i.e., the size of this builder is 0,
      * an empty segment is added.
-     * If {@link #absolute(boolean)} is set to false, the size of this builder is larger
-     * than or equal to {@code 2}, and the first two segments are all empty, then a dot segment
-     * {@code "."} is prepended to this builder to prevent mistaken for an absolute path.
-     * If the size of this builder is not equal to {@code 0}, and the first segment contains
-     * colon (":") characters, then a dot segment {@code "."} is prepended to this builder to
-     * prevent mistaken for a scheme name.
      *
      * @return The path component
      * @throws UriSyntaxException when there is something wrong with the syntax of path component

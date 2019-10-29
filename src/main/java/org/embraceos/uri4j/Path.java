@@ -59,6 +59,9 @@ import java.util.function.Consumer;
 @Immutable
 public interface Path extends Iterable<String>, Comparable<Path> {
 
+    String SINGLE_DOT_SEGMENT = ".";
+    String DOUBLE_DOTS_SEGMENT = "..";
+
     /**
      * Returns the path component as a whole string, which will not be null,
      * but may be empty (zero length).
@@ -121,6 +124,29 @@ public interface Path extends Iterable<String>, Comparable<Path> {
      * <a href="https://tools.ietf.org/html/rfc3986#section-6.2.2.3">Normalizes</a> this path
      * component, and returns the normalized path component or just this path component if it
      * is already in normalized form.
+     *
+     * <p> The normalizing process is as follows:
+     * <ol>
+     *   <li> All {@code "."} segments are removed.
+     *   <li> If a {@code ".."} segment is preceded by a non-{@code ".."} segment then both of
+     *   these segments are removed.  This step is repeated until it is no longer applicable.
+     *   <li> If this path is absolute, all leading double-dots segments is removed.
+     *   <li> All percent-encoding octets will be capitalized.
+     * </ol>
+     *
+     * <p> <b>Note:</b> Because some paths is invalid in some URIs according to
+     * <a href="https://tools.ietf.org/html/rfc3986">RFC3986</a>, which includes:
+     * <ul>
+     *   <li>RFC3986#3: When authority is not present, the path cannot begin with two slash characters ("//").
+     *   <li>RFC3986#4.2: A path segment that contains a colon character cannot be used as the first
+     *   segment of a relative-path reference.
+     * </ul>
+     * <p> So in these two situations, a single-dot segment will be prepended to prevent ambiguous and conflict.
+     *
+     * <p> A normalized path will begin with one or more {@code ".."} segments if it's relative and
+     * there were insufficient non-{@code ".."} segments preceding them to allow their removal.
+     * A normalized path will begin with a {@code "."} segment if one was inserted as above.
+     * Otherwise, a normalized path will not contain any {@code "."} or {@code ".."} segments.
      *
      * @return The normalized path component or just this path component if it is already in normalized form
      * @throws UriException if there is problem normalizing this path component
