@@ -118,7 +118,15 @@ public interface Path extends Iterable<String>, Comparable<Path> {
      * @return The resolved path component
      * @throws UriException if there is problem resolving path component
      */
-    Path resolve(Path that) throws UriException;
+    default Path resolve(Path that) throws UriException {
+        if (that.isAbsolute()) {
+            return that.normalize();
+        } else {
+            return mutate().tear(1)
+                    .segments(that.segments().toArray(new String[0]))
+                    .build().normalize();
+        }
+    }
 
     /**
      * <a href="https://tools.ietf.org/html/rfc3986#section-6.2.2.3">Normalizes</a> this path
