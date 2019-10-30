@@ -18,6 +18,8 @@ package org.embraceos.uri4j;
 
 import org.apiguardian.api.API;
 
+import javax.annotation.concurrent.ThreadSafe;
+
 /**
  * This interface is used to normalize URIs.
  *
@@ -40,6 +42,7 @@ import org.apiguardian.api.API;
  * @see Uri#normalize()
  */
 @API(status = API.Status.STABLE)
+@ThreadSafe
 public interface UriNormalizer {
 
     /**

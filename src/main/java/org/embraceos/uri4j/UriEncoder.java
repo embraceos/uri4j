@@ -19,6 +19,7 @@ package org.embraceos.uri4j;
 import org.apiguardian.api.API;
 import org.embraceos.uri4j.internal.impl.UriEncoderImpl;
 
+import javax.annotation.concurrent.ThreadSafe;
 import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -33,6 +34,7 @@ import java.nio.charset.StandardCharsets;
  * @see UriDecoder
  */
 @API(status = API.Status.STABLE)
+@ThreadSafe
 public interface UriEncoder {
 
     /**

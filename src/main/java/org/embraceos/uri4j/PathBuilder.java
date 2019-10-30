@@ -18,6 +18,7 @@ package org.embraceos.uri4j;
 
 import org.apiguardian.api.API;
 
+import javax.annotation.concurrent.NotThreadSafe;
 import java.util.List;
 
 /**
@@ -60,6 +61,7 @@ import java.util.List;
  * @see Path
  */
 @API(status = API.Status.STABLE)
+@NotThreadSafe
 public interface PathBuilder {
 
     /**

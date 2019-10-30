@@ -19,6 +19,7 @@ package org.embraceos.uri4j;
 import org.apiguardian.api.API;
 import org.embraceos.uri4j.internal.lang.Nullable;
 
+import javax.annotation.concurrent.NotThreadSafe;
 import java.util.function.Consumer;
 
 /**
@@ -55,6 +56,7 @@ import java.util.function.Consumer;
  * @see Uri
  */
 @API(status = API.Status.STABLE)
+@NotThreadSafe
 public interface UriBuilder {
 
     /**
