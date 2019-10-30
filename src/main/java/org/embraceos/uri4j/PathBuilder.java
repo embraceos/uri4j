@@ -18,6 +18,8 @@ package org.embraceos.uri4j;
 
 import org.apiguardian.api.API;
 
+import java.util.List;
+
 /**
  * Builder-style methods to build path components of URI-reference.
  *
@@ -67,7 +69,9 @@ public interface PathBuilder {
      * @return This path builder for further processing
      * @throws UriSyntaxException when there is something wrong with the syntax of segments
      */
-    PathBuilder segments(String... segments) throws UriSyntaxException;
+    default PathBuilder segments(String... segments) throws UriSyntaxException {
+        return segments(size(), segments);
+    }
 
     /**
      * Appends the given segments to the end of this path, of which {@code null} values will be ignored.
@@ -78,7 +82,9 @@ public interface PathBuilder {
      * @param segments The segments to be appended
      * @return This path builder for further processing
      */
-    PathBuilder rawSegments(byte[]... segments);
+    default PathBuilder rawSegments(byte[]... segments) {
+        return rawSegments(size(), segments);
+    }
 
     /**
      * Appends the given segments to the end of this path, of which {@code null} values will be ignored.
@@ -90,7 +96,9 @@ public interface PathBuilder {
      * @param segments The segments to be appended
      * @return This path builder for further processing
      */
-    PathBuilder utf8Segments(String... segments);
+    default PathBuilder utf8Segments(String... segments) {
+        return utf8Segments(size(), segments);
+    }
 
     /**
      * Adds the given segments to the specified position of this path, of which {@code null} values
@@ -116,7 +124,14 @@ public interface PathBuilder {
      * @return This path builder for further processing
      * @throws IndexOutOfBoundsException if the index is out of range (index < 0 || index > size())
      */
-    PathBuilder rawSegments(int index, byte[]... segments) throws IndexOutOfBoundsException;
+    default PathBuilder rawSegments(int index, byte[]... segments) throws IndexOutOfBoundsException {
+        String[] encoded = new String[segments.length];
+        for (int i = 0; i < segments.length; i++) {
+            byte[] segment = segments[i];
+            encoded[i] = segment == null ? null : UriEncoder.forSegment().encode(segment);
+        }
+        return segments(index, encoded);
+    }
 
     /**
      * Adds the given segments to the specified position of this path, of which {@code null} values
@@ -131,7 +146,14 @@ public interface PathBuilder {
      * @return This path builder for further processing
      * @throws IndexOutOfBoundsException if the index is out of range (index < 0 || index > size())
      */
-    PathBuilder utf8Segments(int index, String... segments) throws IndexOutOfBoundsException;
+    default PathBuilder utf8Segments(int index, String... segments) throws IndexOutOfBoundsException {
+        String[] encoded = new String[segments.length];
+        for (int i = 0; i < segments.length; i++) {
+            String segment = segments[i];
+            encoded[i] = segment == null ? null : UriEncoder.forSegment().encodeUtf8(segment);
+        }
+        return segments(index, encoded);
+    }
 
     /**
      * Overwrites the given segments to the specified position of this path, of which {@code null} values
@@ -167,7 +189,14 @@ public interface PathBuilder {
      * @return This path builder for further processing
      * @throws IndexOutOfBoundsException if the index is out of range (index < 0 || index >= size())
      */
-    PathBuilder setRawSegments(int index, byte[]... segments) throws IndexOutOfBoundsException;
+    default PathBuilder setRawSegments(int index, byte[]... segments) throws IndexOutOfBoundsException {
+        String[] encoded = new String[segments.length];
+        for (int i = 0; i < segments.length; i++) {
+            byte[] segment = segments[i];
+            encoded[i] = segment == null ? null : UriEncoder.forSegment().encode(segment);
+        }
+        return setSegments(index, encoded);
+    }
 
     /**
      * Overwrites the given segments to the specified position of this path, of which {@code null} values
@@ -187,7 +216,14 @@ public interface PathBuilder {
      * @return This path builder for further processing
      * @throws IndexOutOfBoundsException if the index is out of range (index < 0 || index >= size())
      */
-    PathBuilder setUtf8Segments(int index, String... segments) throws IndexOutOfBoundsException;
+    default PathBuilder setUtf8Segments(int index, String... segments) throws IndexOutOfBoundsException {
+        String[] encoded = new String[segments.length];
+        for (int i = 0; i < segments.length; i++) {
+            String segment = segments[i];
+            encoded[i] = segment == null ? null : UriEncoder.forSegment().encodeUtf8(segment);
+        }
+        return setSegments(index, encoded);
+    }
 
     /**
      * Concatenates the given paths to this path builder, of which {@code null} values and empty paths will
@@ -209,7 +245,14 @@ public interface PathBuilder {
      * @param paths The paths to be concatenated
      * @return This path builder for further processing
      */
-    PathBuilder rawPaths(byte[]... paths);
+    default PathBuilder rawPaths(byte[]... paths) {
+        String[] encoded = new String[paths.length];
+        for (int i = 0; i < paths.length; i++) {
+            byte[] path = paths[i];
+            encoded[i] = path == null ? null : UriEncoder.forPath().encode(path);
+        }
+        return paths(encoded);
+    }
 
     /**
      * Concatenates the given paths to this path builder, of which {@code null} values and empty paths will
@@ -222,7 +265,14 @@ public interface PathBuilder {
      * @param paths The paths to be concatenated
      * @return This path builder for further processing
      */
-    PathBuilder utf8Paths(String... paths);
+    default PathBuilder utf8Paths(String... paths) {
+        String[] encoded = new String[paths.length];
+        for (int i = 0; i < paths.length; i++) {
+            String path = paths[i];
+            encoded[i] = path == null ? null : UriEncoder.forPath().encodeUtf8(path);
+        }
+        return paths(encoded);
+    }
 
     /**
      * Removes the first given size segments from this path builder.
@@ -319,10 +369,19 @@ public interface PathBuilder {
     Path build() throws UriSyntaxException;
 
     /**
+     * Returns the segments currently in this builder which is unmodifiable.
+     *
+     * @return the segments currently in this builder
+     */
+    List<String> segments();
+
+    /**
      * Returns the number of segments in this builder.
      *
      * @return The number of segments
      */
-    int size();
+    default int size() {
+        return segments().size();
+    }
 
 }
