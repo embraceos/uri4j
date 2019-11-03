@@ -17,6 +17,7 @@
 package org.embraceos.uri4j;
 
 import org.apiguardian.api.API;
+import org.embraceos.uri4j.internal.impl.PathBuilderImpl;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.List;
@@ -63,6 +64,23 @@ import java.util.List;
 @API(status = API.Status.STABLE)
 @NotThreadSafe
 public interface PathBuilder {
+
+    /**
+     * Creates a PathBuilder with absolute set to true and without any segment.
+     */
+    static PathBuilder create() {
+        return new PathBuilderImpl();
+    }
+
+    /**
+     * Creates a PathBuilder initialized with the given path.
+     *
+     * @param path The path used to initialize builder
+     * @throws UriSyntaxException when there is something wrong with the syntax of the given path
+     */
+    static PathBuilder from(String path) throws UriSyntaxException {
+        return Path.parse(path).mutate();
+    }
 
     /**
      * Appends the given segments to the end of this path, of which {@code null} values will be ignored.

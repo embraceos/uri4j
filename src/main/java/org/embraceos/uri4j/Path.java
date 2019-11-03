@@ -17,6 +17,8 @@
 package org.embraceos.uri4j;
 
 import org.apiguardian.api.API;
+import org.embraceos.uri4j.internal.impl.PathBuilderImpl;
+import org.embraceos.uri4j.internal.impl.PathImpl;
 
 import javax.annotation.concurrent.Immutable;
 import java.util.Iterator;
@@ -61,6 +63,16 @@ public interface Path extends Iterable<String>, Comparable<Path> {
 
     String SINGLE_DOT_SEGMENT = ".";
     String DOUBLE_DOTS_SEGMENT = "..";
+
+    /**
+     * Constructs a Path by parsing the given string.
+     *
+     * @param path The string to be parsed into a Path
+     * @throws UriSyntaxException when there is something wrong with the syntax of path
+     */
+    static Path parse(String path) throws UriSyntaxException {
+        return PathImpl.parse(path);
+    }
 
     /**
      * Returns the path component as a whole string, which will not be null,
@@ -260,6 +272,8 @@ public interface Path extends Iterable<String>, Comparable<Path> {
      *
      * @return The builder
      */
-    PathBuilder mutate();
+    default PathBuilder mutate() {
+        return PathBuilderImpl.from(this);
+    }
 
 }
