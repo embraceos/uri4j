@@ -191,7 +191,7 @@ public interface UriEncoder {
      * @param dst     The {@link Appendable} to which percent-encoded string will be appended
      * @param str     The string to be encoded
      * @param charset The charset to be used to encode string to bytes
-     * @return The percent-encoded string
+     * @return This encoder
      * @throws UncheckedIOException when there is something wrong appending data to dst
      * @see #encode(String, Charset)
      * @see #encodeUtf8(Appendable, String)
@@ -224,7 +224,7 @@ public interface UriEncoder {
      *
      * @param dst The {@link Appendable} to which percent-encoded string will be appended
      * @param str The string to be encoded
-     * @return The percent-encoded string
+     * @return This encoder
      * @throws UncheckedIOException when there is something wrong appending data to dst
      * @see #encodeUtf8(String)
      * @see #encode(Appendable, String, Charset)
