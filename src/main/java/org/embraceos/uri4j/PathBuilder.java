@@ -46,7 +46,7 @@ import java.util.List;
  * <ul>
  *   <li> p is split to segments despite whether it's absolute or not ("/a/b/c" and "a/b/c" are all split
  *   to segments "a", "b" and "c").
- *   <li> If the tail segment is empty, remove it.
+ *   <li> If the tail segment of builder is empty, remove it.
  *   <li> Append these segments to builder.
  * </ul>
  *
