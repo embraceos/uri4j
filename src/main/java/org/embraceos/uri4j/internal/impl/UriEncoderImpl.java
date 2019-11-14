@@ -22,12 +22,12 @@ import org.embraceos.uri4j.internal.*;
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.CoderResult;
-import java.nio.charset.CodingErrorAction;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This method always replaces malformed-input and unmappable-character
@@ -47,7 +47,7 @@ public class UriEncoderImpl implements UriEncoder {
     public static final UriEncoderImpl FRAGMENT = new UriEncoderImpl(UriMasks.FRAGMENT);
     public static final UriEncoderImpl URI = new UriEncoderImpl(UriMasks.URIC);
 
-    private static final ThreadLocal<UTF8Encoder> ENCODERS = ThreadLocal.withInitial(UTF8Encoder::new);
+    private static final ThreadLocal<Map<Charset, Encoder>> ENCODERS = ThreadLocal.withInitial(HashMap::new);
 
     private final AsciiMask mask;
 
@@ -63,6 +63,10 @@ public class UriEncoderImpl implements UriEncoder {
 
     public static UriEncoderImpl extra(String str) throws IllegalArgumentException {
         return new UriEncoderImpl(AsciiMask.combine(UriMasks.UNRESERVED, AsciiMask.allow(str)));
+    }
+
+    private static Encoder getEncoder(Charset charset) {
+        return ENCODERS.get().computeIfAbsent(charset, Encoder::new);
     }
 
     @Override
@@ -83,26 +87,73 @@ public class UriEncoderImpl implements UriEncoder {
     }
 
     @Override
-    public UriEncoder encodeUtf8(Appendable dst, String str) throws UncheckedIOException {
+    public UriEncoder encode(Appendable dst, String str, Charset charset, boolean mixed) throws UncheckedIOException {
+        if (StandardCharsets.UTF_8.equals(charset)) {
+            return encodeUtf8(dst, str, mixed);
+        }
+
+        if (!mixed) {
+            return encode(dst, str.getBytes(charset));
+        }
+
+        if (str.isEmpty()) return this;
+
         try {
-            UTF8Encoder encoder = ENCODERS.get();
-            char[] chars = str.toCharArray();
-            for (int i = 0, end = chars.length - 1; i <= end; i++) {
-                char c = chars[i];
+            Encoder encoder = getEncoder(charset);
+            ByteProcessor processor = b -> {
+                try {
+                    char c = (char) ((int) b & 0xFF);
+                    if (mask.match(c)) {
+                        dst.append(c);
+                    } else {
+                        dst.append('%').append(Hex.toString(b));
+                    }
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            };
+
+            int index = 0;
+            int off = indexOfTriplet(str, 0);
+            while (off != -1) {
+                encoder.encode(processor, str, index, off);
+                char h = Character.toUpperCase(str.charAt(off + 1)), l = Character.toUpperCase(str.charAt(off + 2));
+                dst.append(str.charAt(off)).append(h).append(l);
+                index = off = off + 3;
+                off = indexOfTriplet(str, off);
+            }
+            encoder.encode(processor, str, index, str.length());
+
+            return this;
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    @Override
+    public UriEncoder encodeUtf8(Appendable dst, String str, boolean mixed) throws UncheckedIOException {
+        try {
+            Encoder encoder = getEncoder(StandardCharsets.UTF_8);
+            ByteProcessor processor = b -> {
+                try {
+                    dst.append('%').append(Hex.toString(b));
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            };
+
+            for (int i = 0, end = str.length() - 1; i <= end; i++) {
+                char c = str.charAt(i);
                 if (mask.match(c)) {
                     dst.append(c);
+                } else if (mixed && isTriplet(str, i)) {
+                    char h = Character.toUpperCase(str.charAt(++i)), l = Character.toUpperCase(str.charAt(++i));
+                    dst.append(c).append(h).append(l);
                 } else {
-                    do {
-                        Verify.verify(encoder.isWritable(), "cb should have remaining");
-                        if (!Character.isSurrogate(c) || i == end) {
-                            if (encoder.write(c).isWritable()) continue;
-                        } else if (/* Character.isSurrogate(c) && */encoder.writable() >= 2) {
-                            if (encoder.write(c).write(chars[++i]).isWritable()) continue;
-                        } else i-- /* rollback pointer and encode existing */;
-                        encoder.encode(dst);
-                    } while (i < end && !mask.match(chars[i + 1]) /* side-effects */ && (c = chars[++i]) >= 0);
-                    if (!encoder.isEmpty()) encoder.encode(dst);
-                    Verify.verify(encoder.isEmpty());
+                    int to = i + 1;
+                    while (to <= end && !mask.match(str.charAt(to)) && !(mixed && isTriplet(str, to))) to++;
+                    encoder.encode(processor, str, i, to);
+                    i = to - 1;
                 }
             }
 
@@ -112,27 +163,56 @@ public class UriEncoderImpl implements UriEncoder {
         }
     }
 
-    private static class UTF8Encoder {
+    private int indexOfTriplet(String str, int off) {
+        Preconditions.checkIndex(off, str.length());
 
-        private static final float MAX_BYTES_PER_CHAR_IN_UTF8 = StandardCharsets.UTF_8.newEncoder().maxBytesPerChar();
+        int end = str.length() - 2;
+        for (int i = off; i < end; i++) {
+            if (isTriplet(str, i)) return i;
+        }
+        return -1;
+    }
+
+    private boolean isTriplet(String str, int off) throws IndexOutOfBoundsException {
+        Preconditions.checkIndex(off, str.length());
+
+        if (str.length() - off < 3) return false;
+        if (str.charAt(off) != '%') return false;
+
+        char h = str.charAt(off + 1), l = str.charAt(off + 2);
+        return Hex.isHex(h) && Hex.isHex(l);
+    }
+
+    private interface ByteProcessor {
+        void process(byte b);
+    }
+
+    private static class Encoder {
+
         private static final int CHAR_BUFFER_CAPACITY = 16;
-        private static final int BYTE_BUFFER_CAPACITY = (int) Math.ceil(CHAR_BUFFER_CAPACITY * MAX_BYTES_PER_CHAR_IN_UTF8);
 
-        private final CharBuffer cb = CharBuffer.allocate(CHAR_BUFFER_CAPACITY);
-        private final ByteBuffer bb = ByteBuffer.allocate(BYTE_BUFFER_CAPACITY);
-        private final CharsetEncoder encoder = StandardCharsets.UTF_8.newEncoder()
-            .onMalformedInput(CodingErrorAction.REPLACE)
-            .onUnmappableCharacter(CodingErrorAction.REPLACE);
+        private final CharsetEncoder encoder;
+        private final CharBuffer cb;
+        private final ByteBuffer bb;
 
-        UTF8Encoder() {
+        Encoder(Charset charset) {
+            this.encoder = charset.newEncoder()
+                .onMalformedInput(CodingErrorAction.REPLACE)
+                .onUnmappableCharacter(CodingErrorAction.REPLACE);
+
+            float maxBytesPerChar = this.encoder.maxBytesPerChar();
+            int byteBufferCapacity = (int) Math.ceil(CHAR_BUFFER_CAPACITY * maxBytesPerChar);
+
+            this.cb = CharBuffer.allocate(CHAR_BUFFER_CAPACITY);
+            this.bb = ByteBuffer.allocate(byteBufferCapacity);
         }
 
-        UTF8Encoder write(char c) {
+        Encoder write(char c) throws BufferOverflowException {
             cb.put(c);
             return this;
         }
 
-        void encode(Appendable dst) throws IOException {
+        void encode(ByteProcessor processor) {
             cb.flip();
             bb.clear();
             encoder.reset();
@@ -144,10 +224,31 @@ public class UriEncoderImpl implements UriEncoder {
 
             bb.flip();
             while (bb.hasRemaining()) {
-                dst.append('%').append(Hex.toString(bb.get()));
+                processor.process(bb.get());
             }
 
             cb.clear();
+        }
+
+        void encode(ByteProcessor processor, String str, int from, int to) {
+            Preconditions.checkPositiveRange(str.length(), from, to);
+            Preconditions.checkState(isEmpty());
+
+            for (int i = from, end = to - 1; i <= end; i++) {
+                char c = str.charAt(i);
+                Verify.verify(isWritable(), "cb should have remaining");
+
+                if (!Character.isSurrogate(c) || i == end) {
+                    if (write(c).isWritable()) continue;
+                } else if (/* Character.isSurrogate(c) && */ writable() >= 2) {
+                    if (write(c).write(str.charAt(++i)).isWritable()) continue;
+                } else i-- /* rollback pointer and encode existing */;
+
+                encode(processor);
+            }
+
+            if (!isEmpty()) encode(processor);
+            Verify.verify(isEmpty());
         }
 
         int writable() {

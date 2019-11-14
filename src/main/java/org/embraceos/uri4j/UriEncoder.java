@@ -22,7 +22,6 @@ import org.embraceos.uri4j.internal.impl.UriEncoderImpl;
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 /**
  * An engine that can transform a sequence of raw bytes into a String by
@@ -175,13 +174,12 @@ public interface UriEncoder {
      * @param str     The string to be encoded
      * @param charset The charset to be used to encode string to bytes
      * @return The percent-encoded string
+     * @see #encode(String, Charset, boolean)
      * @see #encode(Appendable, String, Charset)
      * @see #encodeUtf8(String)
      */
     default String encode(String str, Charset charset) {
-        StringBuilder sb = new StringBuilder(str.length() << 1);
-        encode(sb, str, charset);
-        return sb.toString();
+        return encode(str, charset, false);
     }
 
     /**
@@ -193,15 +191,61 @@ public interface UriEncoder {
      * @param charset The charset to be used to encode string to bytes
      * @return This encoder
      * @throws UncheckedIOException when there is something wrong appending data to dst
+     * @see #encode(Appendable, String, Charset, boolean)
      * @see #encode(String, Charset)
      * @see #encodeUtf8(Appendable, String)
      */
     default UriEncoder encode(Appendable dst, String str, Charset charset) throws UncheckedIOException {
-        if (StandardCharsets.UTF_8.equals(charset)) {
-            return encodeUtf8(dst, str);
-        }
-        return encode(dst, str.getBytes(charset));
+        return encode(dst, str, charset, false);
     }
+
+    /**
+     * Encodes the given string to bytes using given charset and than encodes that bytes
+     * to percent-encoded string.
+     *
+     * <p> This method can encode str in mixed mode or not, depending on the given {@code mixed}
+     * argument. With mixed mode on, the percent-encoding triplets in given {@code str} would be
+     * preserved, i.e., not to be encoded. So, the meaning of mixed mode is that there are some
+     * percent-encoding triplets mixed here already. For example, path segment "a%20b" would be
+     * encoded to "a%2520b" with charset utf-8 and mixed mode off, but would be encoded to "a%20b"
+     * with same charset and mixed mode on.
+     *
+     * @param str     The string to be encoded
+     * @param charset The charset to be used to encode string to bytes
+     * @param mixed   Whether to encode given str in mixed mode or not
+     * @return The percent-encoded string
+     * @see #encode(String, Charset)
+     * @see #encode(Appendable, String, Charset)
+     * @see #encodeUtf8(String)
+     */
+    default String encode(String str, Charset charset, boolean mixed) {
+        StringBuilder sb = new StringBuilder(str.length() << 1);
+        encode(sb, str, charset, mixed);
+        return sb.toString();
+    }
+
+    /**
+     * Encodes the given string to bytes using given charset and than encodes that bytes
+     * to percent-encoded string and then appends it to {@code dst}.
+     *
+     * <p> This method can encode str in mixed mode or not, depending on the given {@code mixed}
+     * argument. With mixed mode on, the percent-encoding triplets in given {@code str} would be
+     * preserved, i.e., not to be encoded. So, the meaning of mixed mode is that there are some
+     * percent-encoding triplets mixed here already. For example, path segment "a%20b" would be
+     * encoded to "a%2520b" with charset utf-8 and mixed mode off, but would be encoded to "a%20b"
+     * with same charset and mixed mode on.
+     *
+     * @param dst     The {@link Appendable} to which percent-encoded string will be appended
+     * @param str     The string to be encoded
+     * @param charset The charset to be used to encode string to bytes
+     * @param mixed   Whether to encode given str in mixed mode or not
+     * @return This encoder
+     * @throws UncheckedIOException when there is something wrong appending data to dst
+     * @see #encode(Appendable, String, Charset)
+     * @see #encode(String, Charset)
+     * @see #encodeUtf8(Appendable, String)
+     */
+    UriEncoder encode(Appendable dst, String str, Charset charset, boolean mixed) throws UncheckedIOException;
 
     /**
      * Encodes the given string to bytes using UTF-8 charset and than encodes that bytes
@@ -209,13 +253,12 @@ public interface UriEncoder {
      *
      * @param str The string to be encoded
      * @return The percent-encoded string
+     * @see #encodeUtf8(String, boolean)
      * @see #encodeUtf8(Appendable, String)
      * @see #encode(String, Charset)
      */
     default String encodeUtf8(String str) {
-        StringBuilder sb = new StringBuilder(str.length() << 1);
-        encodeUtf8(sb, str);
-        return sb.toString();
+        return encodeUtf8(str, false);
     }
 
     /**
@@ -226,9 +269,58 @@ public interface UriEncoder {
      * @param str The string to be encoded
      * @return This encoder
      * @throws UncheckedIOException when there is something wrong appending data to dst
+     * @see #encodeUtf8(Appendable, String, boolean)
      * @see #encodeUtf8(String)
      * @see #encode(Appendable, String, Charset)
      */
-    UriEncoder encodeUtf8(Appendable dst, String str) throws UncheckedIOException;
+    default UriEncoder encodeUtf8(Appendable dst, String str) throws UncheckedIOException {
+        return encodeUtf8(dst, str, false);
+    }
+
+    /**
+     * Encodes the given string to bytes using UTF-8 charset and than encodes that bytes
+     * to percent-encoded string.
+     *
+     * <p> This method can encode str in mixed mode or not, depending on the given {@code mixed}
+     * argument. With mixed mode on, the percent-encoding triplets in given {@code str} would be
+     * preserved, i.e., not to be encoded. So, the meaning of mixed mode is that there are some
+     * percent-encoding triplets mixed here already. For example, path segment "a%20b" would be
+     * encoded to "a%2520b" with charset utf-8 and mixed mode off, but would be encoded to "a%20b"
+     * with same charset and mixed mode on.
+     *
+     * @param str   The string to be encoded
+     * @param mixed Whether to encode given str in mixed mode or not
+     * @return The percent-encoded string
+     * @see #encodeUtf8(String)
+     * @see #encodeUtf8(Appendable, String)
+     * @see #encode(String, Charset)
+     */
+    default String encodeUtf8(String str, boolean mixed) {
+        StringBuilder sb = new StringBuilder(str.length() << 1);
+        encodeUtf8(sb, str, mixed);
+        return sb.toString();
+    }
+
+    /**
+     * Encodes the given string to bytes using UTF-8 charset and than encodes that bytes
+     * to percent-encoded string and then appends it to {@code dst}.
+     *
+     * <p> This method can encode str in mixed mode or not, depending on the given {@code mixed}
+     * argument. With mixed mode on, the percent-encoding triplets in given {@code str} would be
+     * preserved, i.e., not to be encoded. So, the meaning of mixed mode is that there are some
+     * percent-encoding triplets mixed here already. For example, path segment "a%20b" would be
+     * encoded to "a%2520b" with charset utf-8 and mixed mode off, but would be encoded to "a%20b"
+     * with same charset and mixed mode on.
+     *
+     * @param dst   The {@link Appendable} to which percent-encoded string will be appended
+     * @param str   The string to be encoded
+     * @param mixed Whether to encode given str in mixed mode or not
+     * @return This encoder
+     * @throws UncheckedIOException when there is something wrong appending data to dst
+     * @see #encodeUtf8(Appendable, String)
+     * @see #encodeUtf8(String)
+     * @see #encode(Appendable, String, Charset)
+     */
+    UriEncoder encodeUtf8(Appendable dst, String str, boolean mixed) throws UncheckedIOException;
 
 }
