@@ -169,7 +169,9 @@ public interface UriBuilder {
      * @return This builder for further processing
      * @see #userInfo(String)
      */
-    UriBuilder rawUserInfo(@Nullable byte[] userInfo);
+    default UriBuilder rawUserInfo(@Nullable byte[] userInfo) {
+        return userInfo(userInfo == null ? null : UriEncoder.forUserInfo().encode(userInfo));
+    }
 
     /**
      * Sets the host component of the final URI-reference, may be null to clear the host.
@@ -200,7 +202,9 @@ public interface UriBuilder {
      * @return This builder for further processing
      * @see #host(String)
      */
-    UriBuilder rawHost(@Nullable byte[] host);
+    default UriBuilder rawHost(@Nullable byte[] host) {
+        return host(host == null ? null : UriEncoder.forHost().encode(host));
+    }
 
     /**
      * Sets the query component of the final URI-reference, may be null to clear the query.
@@ -213,7 +217,9 @@ public interface UriBuilder {
      * @return This builder for further processing
      * @see #query(String)
      */
-    UriBuilder rawQuery(@Nullable byte[] query);
+    default UriBuilder rawQuery(@Nullable byte[] query) {
+        return query(query == null ? null : UriEncoder.forQuery().encode(query));
+    }
 
     /**
      * Sets the fragment component of the final URI-reference, may be null to clear the fragment.
@@ -226,7 +232,9 @@ public interface UriBuilder {
      * @return This builder for further processing
      * @see #fragment(String)
      */
-    UriBuilder rawFragment(@Nullable byte[] fragment);
+    default UriBuilder rawFragment(@Nullable byte[] fragment) {
+        return fragment(fragment == null ? null : UriEncoder.forFragment().encode(fragment));
+    }
 
     /**
      * Sets the userinfo component of the final URI-reference, may be null to clear the userinfo.
@@ -240,7 +248,9 @@ public interface UriBuilder {
      * @return This builder for further processing
      * @see #userInfo(String)
      */
-    UriBuilder utf8UserInfo(@Nullable String userInfo);
+    default UriBuilder utf8UserInfo(@Nullable String userInfo) {
+        return userInfo(userInfo == null ? null : UriEncoder.forUserInfo().encodeUtf8(userInfo));
+    }
 
     /**
      * Sets the host component of the final URI-reference, may be null to clear the host.
@@ -264,7 +274,9 @@ public interface UriBuilder {
      * @return This builder for further processing
      * @see #host(String)
      */
-    UriBuilder utf8Host(@Nullable String host);
+    default UriBuilder utf8Host(@Nullable String host) {
+        return host(host == null ? null : UriEncoder.forHost().encodeUtf8(host));
+    }
 
     /**
      * Sets the query component of the final URI-reference, may be null to clear the query.
@@ -278,7 +290,9 @@ public interface UriBuilder {
      * @return This builder for further processing
      * @see #query(String)
      */
-    UriBuilder utf8Query(@Nullable String query);
+    default UriBuilder utf8Query(@Nullable String query) {
+        return query(query == null ? null : UriEncoder.forQuery().encodeUtf8(query));
+    }
 
     /**
      * Sets the fragment component of the final URI-reference, may be null to clear the fragment.
@@ -292,7 +306,9 @@ public interface UriBuilder {
      * @return This builder for further processing
      * @see #fragment(String)
      */
-    UriBuilder utf8Fragment(@Nullable String fragment);
+    default UriBuilder utf8Fragment(@Nullable String fragment) {
+        return fragment(fragment == null ? null : UriEncoder.forFragment().encodeUtf8(fragment));
+    }
 
     /**
      * Builds and returns the final URI-reference.
