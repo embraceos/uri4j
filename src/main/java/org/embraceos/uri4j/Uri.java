@@ -419,13 +419,10 @@ public interface Uri extends UriRef, Comparable<Uri> {
      *   <li><a href="https://tools.ietf.org/html/rfc3986#section-6.2.4">Protocol-Based Normalization</a></li>
      * </ol>
      *
-     * <p> This method defaults to employ the {@code Syntax-Based normalization} to normalize this URI.
-     * If you want to employ the other level of normalization, or even normalize the URI completely
-     * differently, use {@link UriNormalizer} instead or override this method in subclasses.
+     * <p> This method employs the {@code Syntax-Based normalization} to normalize this URI.
      *
      * @return The normalized URI or just this URI if it is already in normalized form
      * @throws UriException if there is problem normalizing this URI
-     * @see UriNormalizer
      */
     Uri normalize() throws UriException;
 
