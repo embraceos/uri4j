@@ -248,6 +248,45 @@ public interface UriRef {
     String fragment();
 
     /**
+     * Tests this URI reference for equality with another object.
+     *
+     * <p> If the given object is not a URI reference then this method immediately returns {@code false}.
+     * If the given object is a URI then this method immediately returns {@code false}
+     *
+     * <p> The two URI references are considered to be equal if, and only if, following
+     * conditions are all met:
+     *
+     * <ul>
+     *   <li> Their host components are either both be undefined or else be equal without regard to case.
+     *   <li> Their port components are either both be undefined or else be equal.
+     *   <li> Their userinfo components are either both be undefined or else be equal.
+     *   <li> Their path components are equal.
+     *   <li> Their query components are either both be undefined or else be equal.
+     *   <li> Their fragment components are either both be undefined or else be equal.
+     * </ul>
+     *
+     * <p> This method satisfies the general contract of the {@link Object#equals(Object) Object.equals} method.
+     *
+     * @param that The object to which this URI reference is to be compared
+     * @return {@code true} if, and only if, the given object is a URI reference that is
+     * identical to this URI reference
+     * @see #hashCode()
+     */
+    @Override
+    boolean equals(@Nullable Object that);
+
+    /**
+     * Returns a hash-code value for this URI reference. The hash code is based upon all
+     * of the URI reference's components, and satisfies the general contract of the
+     * {@link Object#hashCode() Object.hashCode} method.
+     *
+     * @return A hash-code value for this URI reference
+     * @see #equals(Object)
+     */
+    @Override
+    int hashCode();
+
+    /**
      * Returns the content of this URI-reference as a string.
      *
      * @return The string form of this URI-reference
