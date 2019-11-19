@@ -498,12 +498,12 @@ public interface Uri extends UriRef, Comparable<Uri> {
      *
      * <ul>
      *   <li> Their scheme components are equal without regard to case.
-     *   <li> Their host components are either both be undefined or else be equal without regard to case.
-     *   <li> Their port components are either both be undefined or else be equal.
-     *   <li> Their userinfo components are either both be undefined or else be equal.
+     *   <li> Their host components are either both undefined or else equal without regard to case.
+     *   <li> Their port components are either both undefined or else equal.
+     *   <li> Their userinfo components are either both undefined or else equal.
      *   <li> Their path components are equal.
-     *   <li> Their query components are either both be undefined or else be equal.
-     *   <li> Their fragment components are either both be undefined or else be equal.
+     *   <li> Their query components are either both undefined or else equal.
+     *   <li> Their fragment components are either both undefined or else equal.
      * </ul>
      *
      * <p> Recommends to normalize this URI and the given URI before comparison to reduce the

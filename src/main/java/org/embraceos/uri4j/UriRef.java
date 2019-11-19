@@ -276,12 +276,12 @@ public interface UriRef {
      * conditions are all met:
      *
      * <ul>
-     *   <li> Their host components are either both be undefined or else be equal without regard to case.
-     *   <li> Their port components are either both be undefined or else be equal.
-     *   <li> Their userinfo components are either both be undefined or else be equal.
+     *   <li> Their host components are either both undefined or else equal without regard to case.
+     *   <li> Their port components are either both undefined or else equal.
+     *   <li> Their userinfo components are either both undefined or else equal.
      *   <li> Their path components are equal.
-     *   <li> Their query components are either both be undefined or else be equal.
-     *   <li> Their fragment components are either both be undefined or else be equal.
+     *   <li> Their query components are either both undefined or else equal.
+     *   <li> Their fragment components are either both undefined or else equal.
      * </ul>
      *
      * <p> This method satisfies the general contract of the {@link Object#equals(Object) Object.equals} method.
