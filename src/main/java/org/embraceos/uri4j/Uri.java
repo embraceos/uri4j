@@ -506,6 +506,9 @@ public interface Uri extends UriRef, Comparable<Uri> {
      *   <li> Their fragment components are either both be undefined or else be equal.
      * </ul>
      *
+     * <p> Recommends to normalize this URI and the given URI before comparison to reduce the
+     * probability of false negatives.
+     *
      * <p> This method satisfies the general contract of the {@link Object#equals(Object) Object.equals} method,
      * and is consistent with the {@link #compareTo(Uri)} method.
      *
@@ -513,6 +516,7 @@ public interface Uri extends UriRef, Comparable<Uri> {
      * @return {@code true} if, and only if, the given object is a URI that is identical to this URI
      * @see #compareTo(Uri)
      * @see #hashCode()
+     * @see #normalize()
      */
     @Override
     boolean equals(@Nullable Object that);
