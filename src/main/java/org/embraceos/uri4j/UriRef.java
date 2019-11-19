@@ -71,7 +71,20 @@ public interface UriRef {
      * @see #port()
      */
     @Nullable
-    String authority();
+    default String authority() {
+        if (host() == null) return null;
+
+        StringBuilder sb = new StringBuilder();
+        if (userInfo() != null) {
+            sb.append(userInfo()).append('@');
+        }
+        sb.append(host());
+        if (port() != null) {
+            sb.append(':').append(port());
+        }
+
+        return sb.toString();
+    }
 
     /**
      * Returns the <a href="https://tools.ietf.org/html/rfc3986#section-3.2.1">user information</a>
@@ -140,7 +153,13 @@ public interface UriRef {
      * or {@code -1} if the port component is undefined or empty
      * @throws ArithmeticException if the {@code port} overflows an int
      */
-    int portAsInt() throws ArithmeticException;
+    default int portAsInt() throws ArithmeticException {
+        String port = port();
+        if (port == null || port.isEmpty()) {
+            return -1;
+        }
+        return Math.toIntExact(Long.parseUnsignedLong(port));
+    }
 
     /**
      * Returns the <a href="https://tools.ietf.org/html/rfc3986#section-3.3">path</a>

@@ -144,7 +144,9 @@ public interface Uri extends UriRef, Comparable<Uri> {
      */
     @Override
     @Nullable
-    String authority();
+    default String authority() {
+        return UriRef.super.authority();
+    }
 
     /**
      * Returns the <a href="https://tools.ietf.org/html/rfc3986#section-3.2.1">user information</a>
@@ -218,11 +220,7 @@ public interface Uri extends UriRef, Comparable<Uri> {
      */
     @Override
     default int portAsInt() throws ArithmeticException {
-        String port = port();
-        if (port == null || port.isEmpty()) {
-            return -1;
-        }
-        return Math.toIntExact(Long.parseUnsignedLong(port));
+        return UriRef.super.portAsInt();
     }
 
     /**
