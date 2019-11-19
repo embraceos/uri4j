@@ -520,7 +520,8 @@ public interface Uri extends UriRef, Comparable<Uri> {
     /**
      * Returns a hash-code value for this URI.  The hash code is based upon all
      * of the URI's components, and satisfies the general contract of the
-     * {@link Object#hashCode() Object.hashCode} method.
+     * {@link Object#hashCode() Object.hashCode} method. For {@link #scheme()}
+     * or {@link #host()} component, lowercase it if defined during hash-code calculation.
      *
      * @return A hash-code value for this URI
      * @see #equals(Object)

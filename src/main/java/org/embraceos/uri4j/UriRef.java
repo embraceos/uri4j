@@ -297,7 +297,8 @@ public interface UriRef {
     /**
      * Returns a hash-code value for this URI reference. The hash code is based upon all
      * of the URI reference's components, and satisfies the general contract of the
-     * {@link Object#hashCode() Object.hashCode} method.
+     * {@link Object#hashCode() Object.hashCode} method. For {@link #host()} component, lowercase
+     * it if defined during hash-code calculation.
      *
      * @return A hash-code value for this URI reference
      * @see #equals(Object)
