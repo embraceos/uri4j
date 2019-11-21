@@ -440,36 +440,15 @@ public interface Uri extends UriRef, Comparable<Uri> {
      * <p> The ordering of URIs is defined as follows:
      *
      * <ol>
-     *   <li> Compares the scheme components of two URIs, <b>without regard to case</b>.
-     *   Continues to next step if equal.
-     *
-     *   <li> The URI with host component is considered to be less than
-     *   the URI without host component. If both URIs contain host component,
-     *   compares the host components, <b>without regard to case</b>.
-     *   Continues to next step if equal or both URIs don't contain host component.
-     *
-     *   <li> The URI with port component is considered to be less than
-     *   the URI without port component. If both URIs contain port component,
-     *   the URI with non-empty port component is considered to be less than the URI
-     *   with empty port component. If both URIs contain non-empty port component,
+     *   <li> Compares the scheme components, <b>without regard to case</b>.
+     *   <li> Compares the host components, <b>without regard to case</b>.
+     *   <li> The URI with empty port component is considered to be less than the URI
+     *   with non-empty port component. If both URIs contain non-empty port component,
      *   compares the port components <b>as numbers</b>.
-     *   Continues to next step if equal or both URIs don't contain port component.
-     *
-     *   <li> The URI with userinfo component is considered to be less than
-     *   the URI without userinfo component. If both URIs contain userinfo component,
-     *   compares the userinfo components. Continues to next step if equal
-     *   or both URIs don't contain userinfo component.
-     *
-     *   <li> Compares the path components of two URIs. Continues to next step if equal.
-     *
-     *   <li> The URI with query component is considered to be less than
-     *   the URI without query component. If both URIs contain query component,
-     *   compares the query components. Continues to next step if equal
-     *   or both URIs don't contain query component.
-     *
-     *   <li> The URI with fragment component is considered to be less than
-     *   the URI without fragment component. If both URIs contain fragment component,
-     *   compares the fragment components.
+     *   <li> Compares the userinfo components.
+     *   <li> Compares the path components.
+     *   <li> Compares the query components.
+     *   <li> Compares the fragment components.
      * </ol>
      *
      * <p> Recommends to normalize this URI and the given URI before comparison to reduce the
