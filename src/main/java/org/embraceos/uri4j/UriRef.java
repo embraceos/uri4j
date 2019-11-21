@@ -20,6 +20,7 @@ import org.apiguardian.api.API;
 import org.embraceos.uri4j.internal.lang.Nullable;
 
 import javax.annotation.concurrent.Immutable;
+import java.math.BigInteger;
 import java.net.URI;
 
 /**
@@ -158,7 +159,7 @@ public interface UriRef {
         if (port == null || port.isEmpty()) {
             return -1;
         }
-        return Math.toIntExact(Long.parseUnsignedLong(port));
+        return new BigInteger(port).intValueExact();
     }
 
     /**
