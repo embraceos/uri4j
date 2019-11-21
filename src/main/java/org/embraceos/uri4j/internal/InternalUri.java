@@ -30,17 +30,19 @@ public class InternalUri {
 
     private static final Pattern PATTERN = Pattern.compile("(?:([^:/?#]+):)?(?://(?:([^@/?#]*)@)?(\\[[^]/?#]*\\]|[^:/?#]*)(?::([^/?#]*))?)?([^?#]*)(?:\\?([^#]*))?(?:#(.*))?");
 
-    @Nullable private String scheme;
-    @Nullable private String userInfo;
-    @Nullable private String host;
-    @Nullable private String port;
-    private String path;
-    @Nullable private String query;
-    @Nullable private String fragment;
+    private final String value;
+    @Nullable private final String scheme;
+    @Nullable private final String userInfo;
+    @Nullable private final String host;
+    @Nullable private final String port;
+    private final String path;
+    @Nullable private final String query;
+    @Nullable private final String fragment;
 
-    public InternalUri(@Nullable String scheme, @Nullable String userInfo,
-                       @Nullable String host, @Nullable String port, String path,
-                       @Nullable String query, @Nullable String fragment) {
+    private InternalUri(String value, @Nullable String scheme, @Nullable String userInfo,
+                        @Nullable String host, @Nullable String port, String path,
+                        @Nullable String query, @Nullable String fragment) {
+        this.value = value;
         this.scheme = scheme;
         this.userInfo = userInfo;
         this.host = host;
@@ -67,7 +69,27 @@ public class InternalUri {
         String query = matcher.group(6);
         String fragment = matcher.group(7);
 
-        return new InternalUri(scheme, userInfo, host, port, path, query, fragment);
+        return new InternalUri(uri, scheme, userInfo, host, port, path, query, fragment);
+    }
+
+    public static InternalUri of(@Nullable String scheme, @Nullable String userInfo,
+                                 @Nullable String host, @Nullable String port, String path,
+                                 @Nullable String query, @Nullable String fragment) {
+        StringBuilder sb = new StringBuilder();
+        if (scheme != null) {
+            sb.append(scheme).append(':');
+        }
+        if (host != null) {
+            sb.append("//");
+            if (userInfo != null) sb.append(userInfo).append("@");
+            sb.append(host);
+            if (port != null) sb.append(':').append(port);
+        }
+        sb.append(path);
+        if (query != null) sb.append('?').append(query);
+        if (fragment != null) sb.append('#').append(fragment);
+
+        return new InternalUri(sb.toString(), scheme, userInfo, host, port, path, query, fragment);
     }
 
     public static Builder create() {
@@ -106,6 +128,11 @@ public class InternalUri {
     @Nullable
     public String fragment() {
         return fragment;
+    }
+
+    @Override
+    public String toString() {
+        return value;
     }
 
     public static class Builder {
@@ -154,7 +181,7 @@ public class InternalUri {
         }
 
         public InternalUri build() {
-            return new InternalUri(scheme, userInfo, host, port, path, query, fragment);
+            return InternalUri.of(scheme, userInfo, host, port, path, query, fragment);
         }
 
     }
