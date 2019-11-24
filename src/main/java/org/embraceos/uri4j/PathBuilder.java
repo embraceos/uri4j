@@ -378,7 +378,7 @@ public interface PathBuilder {
     PathBuilder absolute(boolean absolute);
 
     /**
-     * Builds and returns the final path component which in {@link Path#normalize() normalized form}.
+     * Builds and returns the final path component.
      *
      * <p> If none segment is added to this builder, i.e., the size of this builder is 0,
      * an empty segment is added.

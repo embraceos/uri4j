@@ -20,6 +20,8 @@ import jdk.nashorn.internal.ir.annotations.Immutable;
 import org.embraceos.uri4j.Path;
 import org.embraceos.uri4j.UriException;
 import org.embraceos.uri4j.UriSyntaxException;
+import org.embraceos.uri4j.internal.Hex;
+import org.embraceos.uri4j.internal.UriMasks;
 import org.embraceos.uri4j.internal.UriValidator;
 
 import java.util.*;
@@ -150,30 +152,37 @@ public class PathImpl implements Path {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < segments.size(); i++, sb.setLength(0)) {
             String segment = segments.get(i);
-            boolean contains = false;
+            boolean mutated = false;
 
             int len = segment.length();
             for (int j = 0; j < len; j++) {
                 char c = segment.charAt(j);
                 if (c == '%') {
                     char h = segment.charAt(++j), l = segment.charAt(++j);
+                    char pec = (char) ((int) Hex.toByte(h, l) & 0xFF);
 
-                    if ((Character.isLowerCase(h) || Character.isLowerCase(l)) && !contains) {
+                    boolean unreserved = UriMasks.UNRESERVED.match(pec);
+                    boolean lowercase = Character.isLowerCase(h) || Character.isLowerCase(l);
+                    if (!mutated && (unreserved || lowercase)) {
                         sb.append(segment, 0, j - 2);
-                        contains = true;
+                        mutated = true;
                     }
 
-                    if (contains) {
-                        sb.append(c).append(Character.toUpperCase(h)).append(Character.toUpperCase(l));
+                    if (mutated) {
+                        if (unreserved) {
+                            sb.append(pec);
+                        } else {
+                            sb.append(c).append(Character.toUpperCase(h)).append(Character.toUpperCase(l));
+                        }
                     }
                 } else {
-                    if (contains) {
+                    if (mutated) {
                         sb.append(c);
                     }
                 }
             }
 
-            if (contains) {
+            if (mutated) {
                 segments.set(i, sb.toString());
             }
         }

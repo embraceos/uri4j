@@ -148,7 +148,7 @@ public class PathBuilderImpl implements PathBuilder {
             UriValidator.INSTANCE.validateSegment(segment);
         }
 
-        return new PathImpl(absolute, segments).normalize();
+        return new PathImpl(absolute, segments);
     }
 
     @Override

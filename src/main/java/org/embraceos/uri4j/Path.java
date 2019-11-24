@@ -135,8 +135,8 @@ public interface Path extends Iterable<String>, Comparable<Path> {
             return that.normalize();
         } else {
             return mutate().tear(1)
-                    .segments(that.segments().toArray(new String[0]))
-                    .build().normalize();
+                .segments(that.segments().toArray(new String[0]))
+                .build().normalize();
         }
     }
 
@@ -152,6 +152,7 @@ public interface Path extends Iterable<String>, Comparable<Path> {
      *   these segments are removed.  This step is repeated until it is no longer applicable.
      *   <li> If this path is absolute, all leading double-dots segments is removed.
      *   <li> All percent-encoding octets will be capitalized.
+     *   <li> All percent-encoding octets that corresponds to an unreserved character will be decoded.
      * </ol>
      *
      * <p> <b>Note:</b> Because some paths is invalid in some URIs according to
