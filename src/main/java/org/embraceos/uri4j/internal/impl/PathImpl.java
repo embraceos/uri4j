@@ -20,8 +20,7 @@ import jdk.nashorn.internal.ir.annotations.Immutable;
 import org.embraceos.uri4j.Path;
 import org.embraceos.uri4j.UriException;
 import org.embraceos.uri4j.UriSyntaxException;
-import org.embraceos.uri4j.internal.Hex;
-import org.embraceos.uri4j.internal.UriMasks;
+import org.embraceos.uri4j.internal.UriUtils;
 import org.embraceos.uri4j.internal.UriValidator;
 
 import java.util.*;
@@ -37,11 +36,17 @@ public class PathImpl implements Path {
 
     private volatile boolean normalized;
 
-    private PathImpl(String value) {
+    /**
+     * @param value must be validated by {@link UriValidator}
+     */
+    PathImpl(String value) {
         this.value = value;
         this.segments = parseSegments(value);
     }
 
+    /**
+     * @param segments must be validated by {@link UriValidator}
+     */
     PathImpl(boolean absolute, List<String> segments) {
         this.value = joinSegments(absolute, segments);
         this.segments = Collections.unmodifiableList(segments);
@@ -101,6 +106,8 @@ public class PathImpl implements Path {
 
     private PathImpl normalize0() {
         List<String> segments = new LinkedList<>();
+
+        // process dot-segments
         for (String seg : segments()) {
             if (SINGLE_DOT_SEGMENT.equals(seg)) {
                 // just drop it
@@ -121,6 +128,7 @@ public class PathImpl implements Path {
             }
         }
 
+        // remove double-dot segments if absolute
         if (isAbsolute()) {
             Iterator<String> iterator = segments.iterator();
             while (iterator.hasNext()) {
@@ -133,58 +141,22 @@ public class PathImpl implements Path {
             }
         }
 
+        // prepend a single-dot segment for special case
         if (segments.size() >= 2 && isAbsolute() && segments.get(0).isEmpty()) { // start with "//"
             segments.add(0, SINGLE_DOT_SEGMENT);
         } else if (!segments.isEmpty() && !isAbsolute() && segments.get(0).indexOf(':') != -1) { // first segment contains colon
             segments.add(0, SINGLE_DOT_SEGMENT);
         }
 
-        normalizeSegments(segments);
+        // normalize percent-encoding triplets
+        for (int i = 0; i < segments.size(); i++) {
+            segments.set(i, UriUtils.normalize(segments.get(i)));
+        }
 
         if (segments.equals(segments())) {
             return this;
         } else {
             return new PathImpl(isAbsolute(), segments);
-        }
-    }
-
-    private void normalizeSegments(List<String> segments) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < segments.size(); i++, sb.setLength(0)) {
-            String segment = segments.get(i);
-            boolean mutated = false;
-
-            int len = segment.length();
-            for (int j = 0; j < len; j++) {
-                char c = segment.charAt(j);
-                if (c == '%') {
-                    char h = segment.charAt(++j), l = segment.charAt(++j);
-                    char pec = (char) ((int) Hex.toByte(h, l) & 0xFF);
-
-                    boolean unreserved = UriMasks.UNRESERVED.match(pec);
-                    boolean lowercase = Character.isLowerCase(h) || Character.isLowerCase(l);
-                    if (!mutated && (unreserved || lowercase)) {
-                        sb.append(segment, 0, j - 2);
-                        mutated = true;
-                    }
-
-                    if (mutated) {
-                        if (unreserved) {
-                            sb.append(pec);
-                        } else {
-                            sb.append(c).append(Character.toUpperCase(h)).append(Character.toUpperCase(l));
-                        }
-                    }
-                } else {
-                    if (mutated) {
-                        sb.append(c);
-                    }
-                }
-            }
-
-            if (mutated) {
-                segments.set(i, sb.toString());
-            }
         }
     }
 
