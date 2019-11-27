@@ -150,6 +150,7 @@ public interface Path extends Iterable<String>, Comparable<Path> {
      *   <li> All {@code "."} segments are removed.
      *   <li> If a {@code ".."} segment is preceded by a non-{@code ".."} segment then both of
      *   these segments are removed.  This step is repeated until it is no longer applicable.
+     *   <li> If the last segment is dot-segment, append an empty segment.
      *   <li> If this path is absolute, all leading double-dots segments is removed.
      *   <li> All percent-encoding octets will be capitalized.
      *   <li> All percent-encoding octets that corresponds to an unreserved character will be decoded.

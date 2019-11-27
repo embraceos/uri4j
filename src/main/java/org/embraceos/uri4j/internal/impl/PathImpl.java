@@ -22,6 +22,7 @@ import org.embraceos.uri4j.UriException;
 import org.embraceos.uri4j.UriSyntaxException;
 import org.embraceos.uri4j.internal.UriUtils;
 import org.embraceos.uri4j.internal.UriValidator;
+import org.embraceos.uri4j.internal.Verify;
 
 import java.util.*;
 
@@ -128,6 +129,12 @@ public class PathImpl implements Path {
             }
         }
 
+        // append an empty segment if the last segment is dot segment
+        String lastSeg = segments().get(segments().size() - 1);
+        if (Path.SINGLE_DOT_SEGMENT.equals(lastSeg) || Path.DOUBLE_DOTS_SEGMENT.equals(lastSeg)) {
+            segments.add("");
+        }
+
         // remove double-dot segments if absolute
         if (isAbsolute()) {
             Iterator<String> iterator = segments.iterator();
@@ -153,6 +160,7 @@ public class PathImpl implements Path {
             segments.set(i, UriUtils.normalize(segments.get(i)));
         }
 
+        Verify.verify(!segments.isEmpty());
         if (segments.equals(segments())) {
             return this;
         } else {
