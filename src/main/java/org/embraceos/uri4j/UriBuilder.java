@@ -17,6 +17,7 @@
 package org.embraceos.uri4j;
 
 import org.apiguardian.api.API;
+import org.embraceos.uri4j.internal.impl.UriBuilderImpl;
 import org.embraceos.uri4j.internal.lang.Nullable;
 
 import javax.annotation.concurrent.NotThreadSafe;
@@ -58,6 +59,13 @@ import java.util.function.Consumer;
 @API(status = API.Status.STABLE)
 @NotThreadSafe
 public interface UriBuilder {
+
+    /**
+     * Creates an UriBuilder with empty path and other components undefined.
+     */
+    static UriBuilder create() {
+        return new UriBuilderImpl();
+    }
 
     /**
      * Sets the scheme component of the final URI-reference, may be null to clear the scheme.

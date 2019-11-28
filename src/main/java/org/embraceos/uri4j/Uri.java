@@ -17,6 +17,7 @@
 package org.embraceos.uri4j;
 
 import org.apiguardian.api.API;
+import org.embraceos.uri4j.internal.impl.UriBuilderImpl;
 import org.embraceos.uri4j.internal.lang.Nullable;
 
 import javax.annotation.concurrent.Immutable;
@@ -97,6 +98,34 @@ import java.net.URI;
 @API(status = API.Status.STABLE)
 @Immutable
 public interface Uri extends UriRef, Comparable<Uri> {
+
+    /**
+     * Constructs an URI by parsing the given string.
+     *
+     * @param uri The string to be parsed into an URI
+     * @throws UriSyntaxException when there is something wrong with the syntax of the URI
+     */
+    static Uri parse(String uri) throws UriSyntaxException {
+        try {
+            return UriBuilderImpl.from(uri).build();
+        } catch (ClassCastException e) {
+            throw new UriSyntaxException("scheme is undefined: " + uri);
+        }
+    }
+
+    /**
+     * Constructs an URI from an {@link URI};
+     *
+     * @param uri The {@link URI} to be parsed into an {@link Uri}
+     * @throws UriSyntaxException when there is something wrong with the syntax of URI
+     */
+    static Uri from(URI uri) throws UriSyntaxException {
+        try {
+            return UriBuilderImpl.from(uri).build();
+        } catch (ClassCastException e) {
+            throw new UriSyntaxException("scheme is undefined: " + uri);
+        }
+    }
 
     /**
      * Returns the <a href="https://tools.ietf.org/html/rfc3986#section-3.1">scheme </a>

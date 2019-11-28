@@ -17,6 +17,7 @@
 package org.embraceos.uri4j;
 
 import org.apiguardian.api.API;
+import org.embraceos.uri4j.internal.impl.UriBuilderImpl;
 import org.embraceos.uri4j.internal.lang.Nullable;
 
 import javax.annotation.concurrent.Immutable;
@@ -47,6 +48,32 @@ import java.net.URI;
 @API(status = API.Status.STABLE)
 @Immutable
 public interface UriRef {
+
+    /**
+     * Constructs an URI-reference by parsing the given string.
+     *
+     * <p> If the scheme component is defined, the returned URI-reference will be a {@link Uri},
+     * otherwise it will be a {@link UriRef}.
+     *
+     * @param uriRef The string to be parsed into an URI-reference
+     * @throws UriSyntaxException when there is something wrong with the syntax of URI-reference
+     */
+    static <T extends UriRef> T parse(String uriRef) throws UriSyntaxException {
+        return UriBuilderImpl.from(uriRef).build();
+    }
+
+    /**
+     * Constructs an URI-reference from an {@link URI};
+     *
+     * <p> If the scheme component is defined, the returned URI-reference will be a {@link Uri},
+     * otherwise it will be a {@link UriRef}.
+     *
+     * @param uri The {@link URI} to be parsed into an {@link UriRef}
+     * @throws UriSyntaxException when there is something wrong with the syntax of URI-reference
+     */
+    static <T extends UriRef> T from(URI uri) throws UriSyntaxException {
+        return UriBuilderImpl.from(uri).build();
+    }
 
     /**
      * Returns the <a href="https://tools.ietf.org/html/rfc3986#section-3.2">authority</a>
